@@ -1,25 +1,25 @@
 version: "3.1"
 services:
-  api_mariadb:
+  db:
     image: mariadb:10.4
-    container_name: api_mariadb
+    container_name: mariadb
     restart: unless-stopped
     tty: true
     volumes:
       - database:/var/lib/mysql/
     environment:
-      - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=challenge_eotica
+      - MYSQL_DATABASE=api-laravel
       - MYSQL_USER=root
-      - MYSQL_PASSWORD=1234
+      - MYSQL_PASSWORD=sft6033
+      - MYSQL_ROOT_PASSWORD=sft6033
     ports:
       - "8083:3306"
     networks:
-      - eotica
+      - myNetwork
 
-  api-nginx:
+  server:
     image: nginx:alpine
-    container_name: api_nginx
+    container_name: nginx
     restart: unless-stopped
     tty: true
     working_dir: /application
@@ -29,23 +29,23 @@ services:
     ports:
       - "8080:80"
     links:
-      - api_mariadb
+      - db
     networks:
-      - eotica
+      - myNetwork
 
-  api_php:
+  app:
     build: .
-    container_name: api_php
+    container_name: php
     restart: unless-stopped
     tty: true
     working_dir: /application
     volumes:
       - ./src:/application
     networks:
-      - eotica
+      - myNetwork
 
 networks:
-  eotica:
+  myNetwork:
     driver: bridge
 
 volumes:
